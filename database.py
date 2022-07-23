@@ -1,29 +1,49 @@
+from distutils.util import execute
+from os import close
 import sqlite3
 
-# conn = sqlite3.connect(':memory:') //Cria um banco de dados em mamória
+def connection():
+    conn = sqlite3.connect('costumer.sqlite')
 
-conn = sqlite3.connect('custumer.sqlite')
+    return conn
 
-c = conn.cursor()
 
-c.execute("""CREATE TABLE if not exists costumers (
+def createTable():
+    conn = connection()
+    c = conn
+    
+    c.execute("""CREATE TABLE if not exists costumers (
     first_name text, 
     last_name text,
     email text
-)
-""")
+    )
+    """)
 
-many_costumers = [
-    ('nome1', 'sobrenome1', 'email1'), 
-    ('nome2', 'sobrenome2', 'email2'), 
-    ('nome3', 'sobrenome3', 'email3'), 
-    ('nome4', 'sobrenome4', 'email4'), 
-    ('nome5', 'sobrenome5', 'email5'),
-]
+    conn.commit()
+    conn.close()
 
-# c.execute("INSERT INTO costumers VALUES ('João1', 'Vitor', 'eu@gmail.com')")
-c.executemany("INSERT INTO costumers VALUES (?,?,?)", many_costumers)
+def showAll():
+    conn = connection()
 
-conn.commit()
+    c = conn.cursor()
 
-conn.close()
+    c.execute("SELECT rowid,* FROM costumers")
+
+    items = c.fetchall() 
+
+    for item in items:
+        print(item)
+    
+    conn.commit()
+
+    conn.close()
+
+def addOne(first, last, email):
+    conn= connection()
+
+    c = conn.cursor()
+
+    c.execute("INSERT INTO costumers VALUES (?,?,?)", (first, last, email))
+
+    conn.commit()
+    conn.close()
